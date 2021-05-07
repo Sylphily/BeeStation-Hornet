@@ -146,7 +146,11 @@
 	gas_type = /datum/gas/miasma
 	filled = 1
 
-
+/obj/machinery/portable_atmospherics/canister/sylph
+	name = "sylph canister"
+	desc = "Something has gone quite wrong if we see this!"
+	gas_type = .datum/gas/nitrogen
+	volume = 500
 
 /obj/machinery/portable_atmospherics/canister/proc/get_time_left()
 	if(timing)
