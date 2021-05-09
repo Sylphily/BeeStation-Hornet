@@ -160,3 +160,7 @@
 
 /obj/item/organ/stomach/ethereal/proc/adjust_charge(amount)
 	crystal_charge = clamp(crystal_charge + amount, ETHEREAL_CHARGE_NONE, ETHEREAL_CHARGE_FULL)
+
+/obj/item/organ/stomach/sylph
+	name = "heat core"
+	desc = "The "
