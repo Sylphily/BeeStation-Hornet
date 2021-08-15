@@ -50,6 +50,16 @@
 	description = "Basic mechanical, electronic, surgical and botanical tools."
 	design_ids = list("screwdriver", "wrench", "wirecutters", "crowbar", "multitool", "welding_tool", "tscanner", "analyzer", "cable_coil", "pipe_painter", "airlock_painter", "scalpel", "circular_saw", "surgicaldrill", "retractor", "cautery", "blood_filter", "hemostat", "surgical_drapes", "syringe", "cultivator", "plant_analyzer", "shovel", "spade", "hatchet",  "mop")
 
+/datum/techweb_node/basic_circuitry
+	id = "basic_circuitry"
+	starting_node = TRUE
+	display_name = "Basic Integrated Circuits"
+	description = "Research on how to fully exploit the power of integrated circuits"
+	design_ids = list("integrated_circuit", "circuit_multitool", "comp_arithmetic", "comp_clock", "comp_combiner", "comp_comparison", "comp_delay",
+		"comp_direction", "comp_get_column", "comp_gps", "comp_health", "comp_hear", "comp_index", "comp_index_table", "comp_length", "comp_light", "comp_logic", "comp_mmi", "comp_multiplexer", "comp_not", "comp_ram",
+		"comp_random", "comp_select_query", "comp_species", "comp_textcase","comp_speech", "comp_concat", "comp_concat_list", "comp_speech", "comp_self", "comp_soundemitter", "comp_radio", "comp_tostring",
+		"comp_typecheck", "compact_remote_shell", "component_printer", "comp_string_contains", "usb_cable")
+
 /////////////////////////Biotech/////////////////////////
 /datum/techweb_node/biotech
 	id = "biotech"
@@ -123,24 +133,6 @@
 	description = "Big Data, in space!"
 	prereq_ids = list("base")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
-	export_price = 5000
-
-/datum/techweb_node/circuitresearch
-	id = "circuitresearch"
-	display_name = "Circuit Research"
-	description = "Modular circuitry adaptable to a wide range of utilities."
-	prereq_ids = list("datatheory")
-	design_ids = list("icprinter")
-	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
-	export_price = 5000
-
-/datum/techweb_node/circuitupgrades
-	id = "circuitupgrades"
-	display_name = "Advanced Circuit Research"
-	description = "Advanced designs that expand the possibilities of modular circuits."
-	prereq_ids = list("circuitresearch")
-	design_ids = list("icupgadv", "icupgclo")
-	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 5000)
 	export_price = 5000
 
 /////////////////////////engineering tech/////////////////////////
@@ -303,6 +295,32 @@
 	design_ids = list("disk_shuttle_route_void", "engine_void", "wingpack_ayy")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 12500)
 	export_price = 5000
+
+/////////////////////////integrated circuits tech/////////////////////////
+
+/datum/techweb_node/adv_shells
+	id = "adv_shells"
+	display_name = "Advanced Shell Research"
+	description = "Grants access to more complicated shell designs."
+	prereq_ids = list("basic_circuitry", "engineering")
+	design_ids = list("controller_shell", "scanner_shell", "bot_shell", "door_shell", "money_bot_shell")
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
+
+/datum/techweb_node/movable_shells_tech
+	id = "movable_shells"
+	display_name = "Movable Shell Research"
+	description = "Grants access to movable shells."
+	prereq_ids = list("adv_shells", "robotics")
+	design_ids = list("comp_pull", "drone_shell")
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 3000)
+
+/datum/techweb_node/server_shell_tech
+	id = "server_shell"
+	display_name = "Server Technology Research"
+	description = "Grants access to a server shell that has a very high capacity for components."
+	prereq_ids = list("adv_shells", "computer_hardware_basic")
+	design_ids = list("server_shell")
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 3000)
 
 /////////////////////////robotics tech/////////////////////////
 /datum/techweb_node/robotics
@@ -493,7 +511,7 @@
 	display_name = "Integrated HUDs"
 	description = "The usefulness of computerized records, projected straight onto your eyepiece!"
 	prereq_ids = list("comp_recordkeeping", "emp_basic")
-	design_ids = list("health_hud", "security_hud", "diagnostic_hud", "scigoggles")
+	design_ids = list("health_hud", "security_hud", "diagnostic_hud", "scigoggles", "health_hud_prescription")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1500)
 	export_price = 5000
 
@@ -616,22 +634,6 @@
 	design_ids = list("drill_diamond", "jackhammer", "hypermod", "plasmacutter_adv", "borg_upgrade_cutter")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
 	export_price = 5000
-
-/datum/techweb_node/bluespace_mining
-	id = "bluespace_mining"
-	hidden = TRUE
-	display_name = "Bluespace Mining Technology"
-	description = "Harness the power of bluespace to make materials out of nothing. Slowly."
-	prereq_ids = list("practical_bluespace", "adv_mining")
-	design_ids = list("bluespace_miner")
-	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
-	export_price = 5000
-
-/datum/techweb_node/bluespace_mining/New() //Techweb nodes don't have an init,
-	. = ..()
-
-	hidden = !CONFIG_GET(flag/bsminer_researchable)
-
 
 /datum/techweb_node/janitor
 	id = "janitor"
@@ -1073,7 +1075,7 @@
 	display_name = "Harmonic Nanite Programming"
 	description = "Nanite programs that require seamless integration between nanites and biology."
 	prereq_ids = list("nanite_bio","nanite_smart","nanite_mesh")
-	design_ids = list("fakedeath_nanites","aggressive_nanites","defib_nanites","regenerative_plus_nanites","brainheal_plus_nanites","purging_plus_nanites", "sensor_species_nanites")
+	design_ids = list("fakedeath_nanites","aggressive_nanites","defib_nanites","regenerative_plus_nanites","brainheal_plus_nanites","purging_plus_nanites", "sensor_species_nanites","adrenaline_nanites")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2000, TECHWEB_POINT_TYPE_NANITES = 2000)
 	export_price = 8000
 
@@ -1082,7 +1084,7 @@
 	display_name = "Military Nanite Programming"
 	description = "Nanite programs that perform military-grade functions."
 	prereq_ids = list("nanite_harmonic", "syndicate_basic")
-	design_ids = list("explosive_nanites","pyro_nanites","meltdown_nanites","viral_nanites","nanite_sting_nanites", "adrenaline_nanites")
+	design_ids = list("explosive_nanites","pyro_nanites","meltdown_nanites","viral_nanites","nanite_sting_nanites", "haste_nanites")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500, TECHWEB_POINT_TYPE_NANITES = 2500)
 	export_price = 12500
 
@@ -1146,15 +1148,6 @@
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 10000)
 	export_price = 5000
 	hidden = TRUE
-
-/datum/techweb_node/syndicate_basic/New()		//Crappy way of making syndicate gear decon supported until there's another way.
-	. = ..()
-	boost_item_paths = list()
-	for(var/path in GLOB.uplink_items)
-		var/datum/uplink_item/UI = new path
-		if(!UI.item || !UI.illegal_tech)
-			continue
-		boost_item_paths |= UI.item	//allows deconning to unlock.
 
 /datum/techweb_node/sticky_basic
 	id = "sticky_basic"

@@ -13,6 +13,7 @@ In my current plan for it, 'solid' will be defined as anything with density == 1
 	min_players = 15
 	max_occurrences = 5
 	var/atom/special_target
+	can_malf_fake_alert = TRUE
 
 
 /datum/round_event_control/immovable_rod/admin_setup()
@@ -27,7 +28,7 @@ In my current plan for it, 'solid' will be defined as anything with density == 1
 	announceWhen = 5
 
 /datum/round_event/immovable_rod/announce(fake)
-	priority_announce("What the fuck was that?!", "General Alert")
+	priority_announce("What the fuck was that?!", "General Alert", SSstation.announcer.get_rand_alert_sound())
 
 /datum/round_event/immovable_rod/start()
 	var/datum/round_event_control/immovable_rod/C = control
@@ -149,7 +150,7 @@ In my current plan for it, 'solid' will be defined as anything with density == 1
 		if(U.job in list("Research Director"))
 			playsound(src, 'sound/effects/meteorimpact.ogg', 100, 1)
 			for(var/mob/M in urange(8, src))
-				if(M.is_conscious())
+				if(!M.stat)
 					shake_camera(M, 2, 3)
 			if(wizard)
 				U.visible_message("<span class='boldwarning'>[src] transforms into [wizard] as [U] suplexes them!</span>", "<span class='warning'>As you grab [src], it suddenly turns into [wizard] as you suplex them!</span>")

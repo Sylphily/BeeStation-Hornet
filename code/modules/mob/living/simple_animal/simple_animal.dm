@@ -217,10 +217,10 @@
 	if(isturf(loc) && isopenturf(loc))
 		var/turf/open/ST = loc
 		if(ST.air)
-			var/tox = ST.air.get_moles(/datum/gas/plasma)
-			var/oxy = ST.air.get_moles(/datum/gas/oxygen)
-			var/n2  = ST.air.get_moles(/datum/gas/nitrogen)
-			var/co2 = ST.air.get_moles(/datum/gas/carbon_dioxide)
+			var/tox = ST.air.get_moles(GAS_PLASMA)
+			var/oxy = ST.air.get_moles(GAS_O2)
+			var/n2  = ST.air.get_moles(GAS_N2)
+			var/co2 = ST.air.get_moles(GAS_CO2)
 
 			if(atmos_requirements["min_oxy"] && oxy < atmos_requirements["min_oxy"])
 				. = FALSE
@@ -330,6 +330,9 @@
 	return tab_data
 
 /mob/living/simple_animal/proc/drop_loot()
+	if(flags_1 & HOLOGRAM_1)
+		do_sparks(3, TRUE, src)
+		return
 	if(loot.len)
 		for(var/i in loot)
 			new i(loc)
@@ -368,7 +371,7 @@
 			return FALSE
 	if (isliving(the_target))
 		var/mob/living/L = the_target
-		if(!L.is_conscious())
+		if(L.stat != CONSCIOUS)
 			return FALSE
 	if (ismecha(the_target))
 		var/obj/mecha/M = the_target
@@ -523,17 +526,13 @@
 		mode()
 
 /mob/living/simple_animal/swap_hand(hand_index)
+	. = ..()
+	if(!.)
+		return
 	if(!dextrous)
-		return ..()
+		return
 	if(!hand_index)
 		hand_index = (active_hand_index % held_items.len)+1
-	var/obj/item/held_item = get_active_held_item()
-	if(held_item)
-		if(istype(held_item, /obj/item/twohanded))
-			var/obj/item/twohanded/T = held_item
-			if(T.wielded == 1)
-				to_chat(usr, "<span class='warning'>Your other hand is too busy holding [T].</span>")
-				return
 	var/oindex = active_hand_index
 	active_hand_index = hand_index
 	if(hud_used)
@@ -566,7 +565,7 @@
 
 //ANIMAL RIDING
 
-/mob/living/simple_animal/user_buckle_mob(mob/living/M, mob/user)
+/mob/living/simple_animal/user_buckle_mob(mob/living/M, mob/user, check_loc = TRUE)
 	var/datum/component/riding/riding_datum = GetComponent(/datum/component/riding)
 	if(riding_datum)
 		if(user.incapacitated())

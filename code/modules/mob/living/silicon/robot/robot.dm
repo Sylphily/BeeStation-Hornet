@@ -67,7 +67,7 @@
 	var/low_power_mode = 0 //whether the robot has no charge left.
 	var/datum/effect_system/spark_spread/spark_system // So they can initialize sparks whenever/N
 
-	var/lawupdate = 1 //Cyborgs will sync their laws with their AI by default
+	var/lawupdate = TRUE //Cyborgs will sync their laws with their AI by default
 	var/scrambledcodes = 0 // Used to determine if a borg shows up on the robotics console.  Setting to one hides them.
 	var/lockcharge //Boolean of whether the borg is locked down or not
 
@@ -124,6 +124,7 @@
 		make_laws()
 		if(!TryConnectToAI())
 			lawupdate = FALSE
+			wires.ui_update()
 
 	radio = new /obj/item/radio/borg(src)
 	if(!scrambledcodes && !builtInCamera)
@@ -190,12 +191,12 @@
 		if(T && istype(radio) && istype(radio.keyslot))
 			radio.keyslot.forceMove(T)
 			radio.keyslot = null
-	qdel(wires)
-	qdel(module)
-	qdel(eye_lights)
-	wires = null
-	module = null
-	eye_lights = null
+	QDEL_NULL(wires)
+	QDEL_NULL(eye_lights)
+	QDEL_NULL(inv1)
+	QDEL_NULL(inv2)
+	QDEL_NULL(inv3)
+	QDEL_NULL(spark_system)
 	cell = null
 	return ..()
 
@@ -332,7 +333,7 @@
 	. = 0
 
 /mob/living/silicon/robot/triggerAlarm(class, area/home, cameras, obj/source)
-	if(source.z != z)
+	if(source.get_virtual_z_level() != get_virtual_z_level())
 		return
 	if(stat == DEAD)
 		return TRUE
@@ -394,6 +395,8 @@
 	var/turf/T0 = get_turf(src)
 	var/turf/T1 = get_turf(A)
 	if (!T0 || ! T1)
+		return FALSE
+	if(A.is_jammed())
 		return FALSE
 	return ISINRANGE(T1.x, T0.x - interaction_range, T0.x + interaction_range) && ISINRANGE(T1.y, T0.y - interaction_range, T0.y + interaction_range)
 
@@ -680,7 +683,7 @@
 	lawupdate = FALSE
 	lockcharge = FALSE
 	mobility_flags |= MOBILITY_FLAGS_DEFAULT
-	scrambledcodes = TRUE
+	scrambledcodes = TRUE_DEVIL
 	//Disconnect it's camera so it's not so easily tracked.
 	if(!QDELETED(builtInCamera))
 		QDEL_NULL(builtInCamera)
@@ -688,6 +691,7 @@
 		// Instead of being listed as "deactivated". The downside is that I'm going
 		// to have to check if every camera is null or not before doing anything, to prevent runtime errors.
 		// I could change the network to null but I don't know what would happen, and it seems too hacky for me.
+	wires.ui_update()
 
 /mob/living/silicon/robot/mode()
 	set name = "Activate Held Object"
@@ -701,10 +705,10 @@
 		W.attack_self(src)
 
 
-/mob/living/silicon/robot/proc/SetLockdown(state = 1)
+/mob/living/silicon/robot/proc/SetLockdown(state = TRUE)
 	// They stay locked down if their wire is cut.
 	if(wires.is_cut(WIRE_LOCKDOWN))
-		state = 1
+		state = TRUE
 	if(state)
 		throw_alert("locked", /atom/movable/screen/alert/locked)
 	else
@@ -1023,6 +1027,7 @@
 		if(admin_revive)
 			locked = TRUE
 		notify_ai(NEW_BORG)
+		wires.ui_update()
 		. = 1
 
 /mob/living/silicon/robot/fully_replace_character_name(oldname, newname)
@@ -1142,6 +1147,7 @@
 
 	diag_hud_set_aishell()
 	undeployment_action.Grant(src)
+	wires.ui_update()
 
 /datum/action/innate/undeployment
 	name = "Disconnect from shell"
@@ -1233,9 +1239,11 @@
 	if(connected_ai)
 		connected_ai.connected_robots += src
 		lawsync()
-		lawupdate = 1
+		lawupdate = TRUE
+		wires.ui_update()
 		return TRUE
 	picturesync()
+	wires.ui_update()
 	return FALSE
 
 /mob/living/silicon/robot/proc/picturesync()
@@ -1246,6 +1254,8 @@
 			aicamera.stored[i] = TRUE
 
 /mob/living/silicon/robot/proc/charge(datum/source, amount, repairs)
+	SIGNAL_HANDLER
+
 	if(module)
 		module.respawn_consumable(src, amount * 0.005)
 	if(cell)

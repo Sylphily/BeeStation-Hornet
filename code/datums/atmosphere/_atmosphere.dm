@@ -20,9 +20,6 @@
 	var/target_pressure = rand(minimum_pressure, maximum_pressure)
 	var/pressure_scalar = target_pressure / maximum_pressure
 
-	if(HAS_TRAIT(SSstation, STATION_TRAIT_UNNATURAL_ATMOSPHERE))
-		restricted_chance = restricted_chance + 40
-
 	// First let's set up the gasmix and base gases for this template
 	// We make the string from a gasmix in this proc because gases need to calculate their pressure
 	var/datum/gas_mixture/gasmix = new
@@ -57,6 +54,6 @@
 	// Now finally lets make that string
 	var/list/gas_string_builder = list()
 	for(var/i in gasmix.get_gases())
-		gas_string_builder += "[GLOB.meta_gas_info[i][META_GAS_ID]]=[gasmix.get_moles(i)]"
+		gas_string_builder += "[GLOB.gas_data.ids[i]]=[gasmix.get_moles(i)]"
 	gas_string_builder += "TEMP=[gasmix.return_temperature()]"
 	gas_string = gas_string_builder.Join(";")

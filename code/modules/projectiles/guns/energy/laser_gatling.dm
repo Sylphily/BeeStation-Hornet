@@ -15,7 +15,7 @@
 	var/armed = 0 //whether the gun is attached, 0 is attached, 1 is the gun is wielded.
 	var/overheat = 0
 	var/overheat_max = 40
-	var/heat_diffusion = 1
+	var/heat_diffusion = 0.5
 
 /obj/item/minigunpack/Initialize()
 	. = ..()
@@ -23,11 +23,14 @@
 	START_PROCESSING(SSobj, src)
 
 /obj/item/minigunpack/Destroy()
+	if(!QDELETED(gun))
+		qdel(gun)
+	gun = null
 	STOP_PROCESSING(SSobj, src)
 	return ..()
 
-/obj/item/minigunpack/process()
-	overheat = max(0, overheat - heat_diffusion)
+/obj/item/minigunpack/process(delta_time)
+	overheat = max(0, overheat - heat_diffusion * delta_time)
 
 //ATTACK HAND IGNORING PARENT RETURN VALUE
 /obj/item/minigunpack/attack_hand(var/mob/living/carbon/user)
@@ -131,6 +134,12 @@
 	else
 		return INITIALIZE_HINT_QDEL //No pack, no gun
 
+	return ..()
+
+/obj/item/gun/energy/minigun/Destroy()
+	if(!QDELETED(ammo_pack))
+		qdel(ammo_pack)
+	ammo_pack = null
 	return ..()
 
 /obj/item/gun/energy/minigun/attack_self(mob/living/user)

@@ -38,9 +38,11 @@
 	master.remove_filter("rad_glow")
 	return ..()
 
-/datum/component/radioactive/process()
+/datum/component/radioactive/process(delta_time)
+	if(!DT_PROB(50, delta_time))
+		return
 	if(strength >= RAD_WAVE_MINIMUM)
-		radiation_pulse(parent, strength, RAD_DISTANCE_COEFFICIENT * RAD_DISTANCE_COEFFICIENT_COMPONENT_MULTIPLIER, FALSE, can_contaminate)
+		radiation_pulse(parent, strength, RAD_DISTANCE_COEFFICIENT*RAD_DISTANCE_COEFFICIENT_COMPONENT_MULTIPLIER, FALSE, can_contaminate)
 	if(!hl3_release_date)
 		return
 	strength -= strength / hl3_release_date
@@ -66,6 +68,8 @@
 		strength = max(strength, _strength)
 
 /datum/component/radioactive/proc/rad_examine(datum/source, mob/user, atom/thing)
+	SIGNAL_HANDLER
+
 	var/atom/master = parent
 	var/list/out = list()
 	if(get_dist(master, user) <= 1)
@@ -82,6 +86,8 @@
 	to_chat(user, out.Join())
 
 /datum/component/radioactive/proc/rad_attack(datum/source, atom/movable/target, mob/living/user)
+	SIGNAL_HANDLER
+
 	radiation_pulse(parent, strength/20)
 	target.rad_act(strength/2)
 	if(!hl3_release_date)
